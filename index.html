@@ -106,7 +106,7 @@
     .button-zone {
       position: relative;
       border-radius: 18px;
-      min-height: 182px;
+      min-height: 160px;
       padding: 14px;
       border: 1px dashed #f0bfd2;
       background: rgba(255, 255, 255, 0.65);
@@ -159,6 +159,19 @@
       top: calc(50% - 27px);
       z-index: 2;
       transform-origin: center;
+    }
+
+    .button-zone.center-yes .yes-btn {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .button-zone.center-yes .yes-btn:hover {
+      transform: translateX(-50%) translateY(-1px) scale(1.01);
+    }
+
+    .button-zone.center-yes .yes-btn:active {
+      transform: translateX(-50%) translateY(1px) scale(0.98);
     }
 
     .reaction {
@@ -282,7 +295,7 @@
         padding: 18px;
       }
       .button-zone {
-        min-height: 210px;
+        min-height: 180px;
       }
       .btn {
         min-width: 122px;
@@ -409,7 +422,12 @@
       function maybeRevealMeme() {
         if (noPressCount === MEME_TRIGGER_PRESSES) {
           memeReveal.classList.remove("hidden");
+          noBtn.classList.add("hidden");
+          noBtn.disabled = true;
+          noIsDodging = false;
+          zone.classList.add("center-yes");
           showCaption("5 NO presses? Meme unlocked.");
+          yesBtn.focus();
         }
       }
 
@@ -542,12 +560,15 @@
         noBaseScale = 1;
 
         noBtn.textContent = "No 🙃";
+        noBtn.disabled = false;
+        noBtn.classList.remove("hidden");
         noBtn.style.left = "";
         noBtn.style.top = "";
         noBtn.style.right = "14px";
         noBtn.style.bottom = "auto";
         noBtn.style.top = "calc(50% - 27px)";
         noBtn.style.transform = "scale(1)";
+        zone.classList.remove("center-yes");
 
         burstLayer.innerHTML = "";
         yesState.classList.add("hidden");
