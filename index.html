@@ -529,6 +529,7 @@
         noState.classList.add("hidden");
 
         if (type === "yes") {
+          zone.classList.add("hidden");
           memeReveal.classList.add("hidden");
           yesState.classList.remove("hidden");
           yesState.focus();
@@ -571,6 +572,7 @@
         zone.classList.remove("center-yes");
 
         burstLayer.innerHTML = "";
+        zone.classList.remove("hidden");
         yesState.classList.add("hidden");
         noState.classList.add("hidden");
         memeReveal.classList.add("hidden");
