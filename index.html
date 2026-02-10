@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Will You Be My Valentine?</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' x='8' font-size='44'%3E%F0%9F%92%98%3C/text%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg-1: #fff3f7;
+      --bg-2: #ffe2ec;
+      --card: #fffafc;
+      --text: #4c2032;
+      --muted: #7a4d5f;
+      --yes: #e73774;
+      --yes-dark: #c81f5c;
+      --no: #ffffff;
+      --no-border: #dca8be;
+      --focus: #8e2de2;
+      --shadow: 0 16px 40px rgba(175, 51, 101, 0.16);
+      --radius: 24px;
+      --max-dodges: 4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Trebuchet MS", "Comic Sans MS", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255, 135, 175, 0.18), transparent 45%),
+        radial-gradient(circle at 85% 10%, rgba(255, 94, 146, 0.14), transparent 38%),
+        repeating-radial-gradient(circle at center, rgba(255, 120, 160, 0.04) 0 2px, transparent 2px 16px),
+        linear-gradient(160deg, var(--bg-1), var(--bg-2));
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    .bg-hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -40px;
+      font-size: clamp(14px, 2vw, 24px);
+      opacity: 0.5;
+      animation: floatUp linear infinite;
+      user-select: none;
+    }
+
+    @keyframes floatUp {
+      from {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.5; }
+      to {
+        transform: translateY(-115vh) translateX(18px) rotate(20deg);
+        opacity: 0;
+      }
+    }
+
+    main {
+      width: min(100%, 680px);
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      background: linear-gradient(180deg, #ffffff, var(--card));
+      border: 1px solid #ffd2e3;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      line-height: 1.2;
+      font-size: clamp(1.6rem, 5vw, 2.25rem);
+    }
+
+    .sub {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: clamp(0.98rem, 2.9vw, 1.05rem);
+    }
+
+    .button-zone {
+      position: relative;
+      border-radius: 18px;
+      min-height: 182px;
+      padding: 14px;
+      border: 1px dashed #f0bfd2;
+      background: rgba(255, 255, 255, 0.65);
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-size: clamp(1rem, 4vw, 1.1rem);
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 54px;
+      min-width: 130px;
+      transition: transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+      touch-action: manipulation;
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    .yes-btn {
+      background: linear-gradient(160deg, var(--yes), #ff4c86);
+      color: white;
+      box-shadow: 0 8px 18px rgba(199, 38, 93, 0.35);
+      position: absolute;
+      left: 14px;
+      top: calc(50% - 27px);
+      z-index: 2;
+    }
+
+    .yes-btn:hover {
+      transform: translateY(-1px) scale(1.01);
+      background: linear-gradient(160deg, var(--yes-dark), #f03a76);
+    }
+
+    .no-btn {
+      background: var(--no);
+      color: #7d304e;
+      border: 2px solid var(--no-border);
+      box-shadow: 0 6px 12px rgba(104, 47, 71, 0.12);
+      position: absolute;
+      right: 14px;
+      top: calc(50% - 27px);
+      z-index: 2;
+      transform-origin: center;
+    }
+
+    .reaction {
+      margin-top: 14px;
+      min-height: 1.8em;
+      color: #913859;
+      font-weight: 700;
+      font-size: clamp(0.92rem, 3.2vw, 1rem);
+    }
+
+    .sfx {
+      display: inline-block;
+      margin-top: 6px;
+      color: #8d4660;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 180ms ease, transform 180ms ease;
+      font-style: italic;
+    }
+
+    .sfx.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .state {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      background: #fff4f8;
+      border: 1px solid #f2c3d6;
+    }
+
+    .state h2 {
+      margin: 0 0 6px;
+      font-size: clamp(1.2rem, 4.8vw, 1.6rem);
+    }
+
+    .state p {
+      margin: 6px 0 0;
+      color: #6f3950;
+    }
+
+    .meme-reveal {
+      margin: 14px auto 0;
+      max-width: 360px;
+      background: #fff;
+      border: 1px solid #f0bfd2;
+      border-radius: 14px;
+      padding: 8px;
+      box-shadow: 0 8px 20px rgba(120, 39, 70, 0.1);
+    }
+
+    .meme-reveal img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+    }
+
+    .meme-reveal figcaption {
+      margin-top: 8px;
+      color: #7e3a59;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .reconsider {
+      margin-top: 12px;
+      background: #fff;
+      border: 2px solid #de9bb9;
+      color: #7a3452;
+    }
+
+    .burst-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 3;
+    }
+
+    .burst {
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      font-size: 20px;
+      opacity: 0;
+      animation: burst 900ms ease-out forwards;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes burst {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.6);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--x), var(--y)) scale(1.2) rotate(var(--rot));
+      }
+    }
+
+    .wiggle {
+      animation: wiggle 220ms ease;
+    }
+
+    @keyframes wiggle {
+      0% { transform: scale(1) rotate(0deg); }
+      30% { transform: scale(0.96) rotate(-4deg); }
+      65% { transform: scale(0.96) rotate(4deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    @media (max-width: 540px) {
+      .card {
+        padding: 18px;
+      }
+      .button-zone {
+        min-height: 210px;
+      }
+      .btn {
+        min-width: 122px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      .heart {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-hearts" aria-hidden="true" id="bgHearts"></div>
+
+  <main>
+    <section class="card" aria-live="polite">
+      <h1 id="title">Cozette will you be my LaCoz? 💘</h1>
+      <p class="sub" id="subtext">Be honest... but choose wisely 😌</p>
+
+      <div class="button-zone" id="buttonZone">
+        <button class="btn yes-btn" id="yesBtn" type="button" aria-label="Yes, I will be your valentine">
+          Yes 💖
+        </button>
+        <button class="btn no-btn" id="noBtn" type="button" aria-label="No, I will not be your valentine">
+          No 🙃
+        </button>
+        <div class="burst-layer" id="burstLayer" aria-hidden="true"></div>
+      </div>
+
+      <p class="reaction" id="reactionText" role="status">Pick a button, brave soul.</p>
+      <span class="sfx" id="sfx" aria-hidden="true">*dramatic sound effect*</span>
+      <figure class="meme-reveal hidden" id="memeReveal">
+        <img id="memeImg" alt="Funny meme card revealed after pressing No five times">
+        <figcaption>5 NO presses unlocked this meme 📸</figcaption>
+      </figure>
+
+      <div class="state hidden" id="yesState" tabindex="-1">
+        <h2>YAY!!! 💞💞💞</h2>
+        <p>W rizz. Valentine secured.</p>
+        <p>Send screenshot as proof 😤</p>
+        <figure class="meme-reveal hidden" id="yesDirectReveal">
+          <img id="yesDirectImg" alt="Valentine GIF shown when Yes is pressed directly">
+          <figcaption id="yesDirectCaption">Direct YES bonus unlocked 💌</figcaption>
+        </figure>
+      </div>
+
+      <div class="state hidden" id="noState" tabindex="-1">
+        <figure class="meme-reveal" aria-label="No response meme">
+          <img id="noStateMemeImg" alt="Funny meme shown after pressing No">
+        </figure>
+        <button class="btn reconsider" id="resetBtn" type="button" aria-label="Reconsider and reset the question">
+          Reconsider 😳
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const MAX_DODGES = 4;
+      const MEME_TRIGGER_PRESSES = 5;
+      const MEME_IMAGE_URL = "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYjRjYjA1bGU5Ymo0OWZ2aW8ycXVzbGdoangyZmwzenpuMXVwaDY0NSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/901mxGLGQN2PyCQpoc/giphy.gif";
+      const YES_DIRECT_GIF_URL = "https://media.giphy.com/media/wvYNSqBAMDVx8CEYkt/giphy.gif";
+      const YES_AFTER_FIVE_GIF_URL = "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2Vsdm54MHM2cHR4dmpzanRvbm8xMno0a2l4d3A0azI1ZWE4MGQwaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/OHRF8LZis06OiPDJby/giphy.gif";
+      const CAPTIONS = [
+        "Are you sure?",
+        "The council will review this decision.",
+        "Pressing NO has consequences 👀",
+        "Lag detected (not really).",
+        "Plot twist: you meant YES."
+      ];
+      const NO_TEXT_VARIANTS = ["No 🙃", "Nope 😶", "Nah 😬", "Definitely... maybe 🤨"];
+
+      const zone = document.getElementById("buttonZone");
+      const yesBtn = document.getElementById("yesBtn");
+      const noBtn = document.getElementById("noBtn");
+      const reactionText = document.getElementById("reactionText");
+      const sfx = document.getElementById("sfx");
+      const yesState = document.getElementById("yesState");
+      const noState = document.getElementById("noState");
+      const noStateMemeImg = document.getElementById("noStateMemeImg");
+      const resetBtn = document.getElementById("resetBtn");
+      const burstLayer = document.getElementById("burstLayer");
+      const bgHearts = document.getElementById("bgHearts");
+      const memeReveal = document.getElementById("memeReveal");
+      const memeImg = document.getElementById("memeImg");
+      const yesDirectReveal = document.getElementById("yesDirectReveal");
+      const yesDirectImg = document.getElementById("yesDirectImg");
+      const yesDirectCaption = document.getElementById("yesDirectCaption");
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      let dodgeCount = 0;
+      let noPressCount = 0;
+      let captionIndex = 0;
+      let noIsDodging = true;
+      let noBaseScale = 1;
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function showSfx() {
+        sfx.classList.add("show");
+        window.clearTimeout(showSfx._timer);
+        showSfx._timer = window.setTimeout(() => sfx.classList.remove("show"), 500);
+      }
+
+      function showCaption(text) {
+        reactionText.textContent = text;
+      }
+
+      function buildMemeImage() {
+        memeImg.src = MEME_IMAGE_URL;
+        noStateMemeImg.src = MEME_IMAGE_URL;
+        yesDirectImg.src = YES_DIRECT_GIF_URL;
+      }
+
+      function maybeRevealMeme() {
+        if (noPressCount === MEME_TRIGGER_PRESSES) {
+          memeReveal.classList.remove("hidden");
+          showCaption("5 NO presses? Meme unlocked.");
+        }
+      }
+
+      function avoidYesOverlap(candidateLeft, candidateTop, noRect, yesRect, zoneRect) {
+        const cLeft = zoneRect.left + candidateLeft;
+        const cTop = zoneRect.top + candidateTop;
+        const cRight = cLeft + noRect.width;
+        const cBottom = cTop + noRect.height;
+        const gap = 14;
+        const overlaps =
+          cRight + gap > yesRect.left &&
+          cLeft - gap < yesRect.right &&
+          cBottom + gap > yesRect.top &&
+          cTop - gap < yesRect.bottom;
+        return !overlaps;
+      }
+
+      function moveNoButton() {
+        const zoneRect = zone.getBoundingClientRect();
+        const noRect = noBtn.getBoundingClientRect();
+        const yesRect = yesBtn.getBoundingClientRect();
+
+        const maxLeft = zone.clientWidth - noRect.width - 10;
+        const maxTop = zone.clientHeight - noRect.height - 10;
+        const minLeft = 10;
+        const minTop = 10;
+
+        let left = minLeft;
+        let top = minTop;
+        let attempts = 0;
+        while (attempts < 20) {
+          left = Math.round(Math.random() * (maxLeft - minLeft) + minLeft);
+          top = Math.round(Math.random() * (maxTop - minTop) + minTop);
+          if (avoidYesOverlap(left, top, noRect, yesRect, zoneRect)) break;
+          attempts++;
+        }
+
+        left = clamp(left, minLeft, maxLeft);
+        top = clamp(top, minTop, maxTop);
+        noBtn.style.left = left + "px";
+        noBtn.style.top = top + "px";
+        noBtn.style.right = "auto";
+        noBtn.style.bottom = "auto";
+      }
+
+      function dodgeNo(e) {
+        if (!noIsDodging) return;
+        e.preventDefault();
+
+        dodgeCount += 1;
+        showCaption(CAPTIONS[captionIndex % CAPTIONS.length]);
+        captionIndex += 1;
+        showSfx();
+
+        noBaseScale = Math.max(0.78, 1 - dodgeCount * 0.06);
+        noBtn.style.transform = "scale(" + noBaseScale.toFixed(2) + ")";
+        noBtn.textContent = NO_TEXT_VARIANTS[dodgeCount % NO_TEXT_VARIANTS.length];
+        noBtn.classList.remove("wiggle");
+        void noBtn.offsetWidth;
+        noBtn.classList.add("wiggle");
+
+        moveNoButton();
+
+        if (dodgeCount >= MAX_DODGES) {
+          noIsDodging = false;
+          noBtn.textContent = "No 🙃";
+          noBtn.style.transform = "scale(1)";
+          showCaption("Fine. You win. NO is now a normal button.");
+        }
+      }
+
+      function onNoPressAttempt(e) {
+        if (e.type === "keydown" && e.repeat) return;
+        noPressCount += 1;
+        maybeRevealMeme();
+        dodgeNo(e);
+      }
+
+      function makeBurst(symbols, count) {
+        for (let i = 0; i < count; i++) {
+          const piece = document.createElement("span");
+          piece.className = "burst";
+          piece.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 40 + Math.random() * 140;
+          const x = Math.cos(angle) * dist + "px";
+          const y = Math.sin(angle) * dist + "px";
+          const rot = (Math.random() * 120 - 60).toFixed(1) + "deg";
+          piece.style.setProperty("--x", x);
+          piece.style.setProperty("--y", y);
+          piece.style.setProperty("--rot", rot);
+          burstLayer.appendChild(piece);
+          window.setTimeout(() => piece.remove(), 950);
+        }
+      }
+
+      function setEndState(type) {
+        yesState.classList.add("hidden");
+        noState.classList.add("hidden");
+
+        if (type === "yes") {
+          memeReveal.classList.add("hidden");
+          yesState.classList.remove("hidden");
+          yesState.focus();
+          showCaption("Certified adorable outcome.");
+          if (noPressCount === 0) {
+            yesDirectReveal.classList.remove("hidden");
+            yesDirectImg.src = YES_DIRECT_GIF_URL;
+            yesDirectCaption.textContent = "Direct YES bonus unlocked 💌";
+          } else {
+            yesDirectReveal.classList.remove("hidden");
+            yesDirectImg.src = YES_AFTER_FIVE_GIF_URL;
+            yesDirectCaption.textContent = "Final YES arc complete 🎬";
+          }
+          if (!prefersReducedMotion) {
+            makeBurst(["💖", "💘", "💕", "✨"], 28);
+          }
+        } else if (type === "no") {
+          noState.classList.remove("hidden");
+          noState.focus();
+          showCaption("Respectfully accepted.");
+        }
+      }
+
+      function resetUI() {
+        dodgeCount = 0;
+        noPressCount = 0;
+        captionIndex = 0;
+        noIsDodging = true;
+        noBaseScale = 1;
+
+        noBtn.textContent = "No 🙃";
+        noBtn.style.left = "";
+        noBtn.style.top = "";
+        noBtn.style.right = "14px";
+        noBtn.style.bottom = "auto";
+        noBtn.style.top = "calc(50% - 27px)";
+        noBtn.style.transform = "scale(1)";
+
+        burstLayer.innerHTML = "";
+        yesState.classList.add("hidden");
+        noState.classList.add("hidden");
+        memeReveal.classList.add("hidden");
+        yesDirectReveal.classList.add("hidden");
+        showCaption("Pick a button, brave soul.");
+        sfx.classList.remove("show");
+        yesBtn.focus();
+      }
+
+      function createFloatingHearts() {
+        if (prefersReducedMotion) return;
+        const count = 14;
+        for (let i = 0; i < count; i++) {
+          const h = document.createElement("span");
+          h.className = "heart";
+          h.textContent = Math.random() > 0.5 ? "💗" : "💖";
+          h.style.left = Math.random() * 100 + "%";
+          h.style.animationDuration = 8 + Math.random() * 8 + "s";
+          h.style.animationDelay = Math.random() * 6 + "s";
+          h.style.opacity = (0.25 + Math.random() * 0.4).toFixed(2);
+          bgHearts.appendChild(h);
+        }
+      }
+
+      noBtn.addEventListener("pointerdown", onNoPressAttempt);
+      noBtn.addEventListener("click", (e) => {
+        if (noIsDodging) {
+          e.preventDefault();
+          return;
+        }
+        setEndState("no");
+      });
+
+      yesBtn.addEventListener("click", () => setEndState("yes"));
+      resetBtn.addEventListener("click", resetUI);
+
+      noBtn.addEventListener("keydown", (e) => {
+        if ((e.key === "Enter" || e.key === " ") && noIsDodging) {
+          onNoPressAttempt(e);
+        }
+      });
+
+      buildMemeImage();
+      createFloatingHearts();
+    })();
+  </script>
+</body>
+</html>
