@@ -250,6 +250,41 @@
       color: #7a3452;
     }
 
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(54, 20, 35, 0.5);
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      z-index: 20;
+    }
+
+    .modal-card {
+      width: min(100%, 360px);
+      background: #fff9fc;
+      border: 1px solid #f2c3d6;
+      border-radius: 18px;
+      box-shadow: 0 18px 36px rgba(95, 33, 58, 0.2);
+      padding: 18px;
+      text-align: center;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .modal-card h3 {
+      margin: 0;
+      font-size: clamp(1.25rem, 5vw, 1.55rem);
+      color: #7a2b4b;
+    }
+
+    .modal-card p {
+      margin: 10px 0 16px;
+      color: #7a4d5f;
+    }
+
     .burst-layer {
       position: absolute;
       inset: 0;
@@ -318,7 +353,7 @@
 
   <main>
     <section class="card" aria-live="polite">
-      <h1 id="title">Cozette will you be my LaCoz? 💘</h1>
+      <h1 id="title">Will you be my valentine? 💘</h1>
       <p class="sub" id="subtext">Be honest... but choose wisely 😌</p>
 
       <div class="button-zone" id="buttonZone">
@@ -341,7 +376,6 @@
       <div class="state hidden" id="yesState" tabindex="-1">
         <h2>YAY!!! 💞💞💞</h2>
         <p>W rizz. Valentine secured.</p>
-        <p>Send screenshot as proof 😤</p>
         <figure class="meme-reveal hidden" id="yesDirectReveal">
           <img id="yesDirectImg" alt="Valentine GIF shown when Yes is pressed directly">
           <figcaption id="yesDirectCaption">Direct YES bonus unlocked 💌</figcaption>
@@ -358,6 +392,16 @@
       </div>
     </section>
   </main>
+
+  <div class="modal-overlay hidden" id="yesConfirmModal" role="dialog" aria-modal="true" aria-labelledby="yesConfirmTitle">
+    <div class="modal-card">
+      <h3 id="yesConfirmTitle">Are you sure?! 🤪</h3>
+      <p>That was fast. Try one more time.</p>
+      <button class="btn reconsider" id="tryAgainBtn" type="button" aria-label="Close confirmation and try again">
+        Try Again
+      </button>
+    </div>
+  </div>
 
   <script>
     (() => {
@@ -376,6 +420,7 @@
       const NO_TEXT_VARIANTS = ["No 🙃", "Nope 😶", "Nah 😬", "Definitely... maybe 🤨"];
 
       const zone = document.getElementById("buttonZone");
+      const title = document.getElementById("title");
       const yesBtn = document.getElementById("yesBtn");
       const noBtn = document.getElementById("noBtn");
       const reactionText = document.getElementById("reactionText");
@@ -391,6 +436,8 @@
       const yesDirectReveal = document.getElementById("yesDirectReveal");
       const yesDirectImg = document.getElementById("yesDirectImg");
       const yesDirectCaption = document.getElementById("yesDirectCaption");
+      const yesConfirmModal = document.getElementById("yesConfirmModal");
+      const tryAgainBtn = document.getElementById("tryAgainBtn");
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       let dodgeCount = 0;
@@ -398,6 +445,7 @@
       let captionIndex = 0;
       let noIsDodging = true;
       let noBaseScale = 1;
+      let hasShownFirstYesPrompt = false;
 
       function clamp(value, min, max) {
         return Math.max(min, Math.min(max, value));
@@ -417,6 +465,13 @@
         memeImg.src = MEME_IMAGE_URL;
         noStateMemeImg.src = MEME_IMAGE_URL;
         yesDirectImg.src = YES_DIRECT_GIF_URL;
+      }
+
+      function applyQuestionFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const q = (params.get("q") || "").trim();
+        if (!q) return;
+        title.textContent = q;
       }
 
       function maybeRevealMeme() {
@@ -541,7 +596,7 @@
           } else {
             yesDirectReveal.classList.remove("hidden");
             yesDirectImg.src = YES_AFTER_FIVE_GIF_URL;
-            yesDirectCaption.textContent = "Final YES arc complete 🎬";
+            yesDirectCaption.textContent = "YES unlocked 💌";
           }
           if (!prefersReducedMotion) {
             makeBurst(["💖", "💘", "💕", "✨"], 28);
@@ -553,12 +608,23 @@
         }
       }
 
+      function openFirstYesPrompt() {
+        yesConfirmModal.classList.remove("hidden");
+        tryAgainBtn.focus();
+      }
+
+      function closeFirstYesPrompt() {
+        yesConfirmModal.classList.add("hidden");
+        yesBtn.focus();
+      }
+
       function resetUI() {
         dodgeCount = 0;
         noPressCount = 0;
         captionIndex = 0;
         noIsDodging = true;
         noBaseScale = 1;
+        hasShownFirstYesPrompt = false;
 
         noBtn.textContent = "No 🙃";
         noBtn.disabled = false;
@@ -577,6 +643,7 @@
         noState.classList.add("hidden");
         memeReveal.classList.add("hidden");
         yesDirectReveal.classList.add("hidden");
+        yesConfirmModal.classList.add("hidden");
         showCaption("Pick a button, brave soul.");
         sfx.classList.remove("show");
         yesBtn.focus();
@@ -606,8 +673,16 @@
         setEndState("no");
       });
 
-      yesBtn.addEventListener("click", () => setEndState("yes"));
+      yesBtn.addEventListener("click", () => {
+        if (noPressCount === 0 && !hasShownFirstYesPrompt) {
+          hasShownFirstYesPrompt = true;
+          openFirstYesPrompt();
+          return;
+        }
+        setEndState("yes");
+      });
       resetBtn.addEventListener("click", resetUI);
+      tryAgainBtn.addEventListener("click", closeFirstYesPrompt);
 
       noBtn.addEventListener("keydown", (e) => {
         if ((e.key === "Enter" || e.key === " ") && noIsDodging) {
@@ -616,6 +691,7 @@
       });
 
       buildMemeImage();
+      applyQuestionFromUrl();
       createFloatingHearts();
     })();
   </script>
