@@ -91,6 +91,25 @@
       overflow: hidden;
     }
 
+    .music-toggle {
+      min-height: 36px;
+      min-width: 98px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 2px solid #efb2c9;
+      background: #fff;
+      color: #7a3452;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .card-footer {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
     h1 {
       margin: 0 0 8px;
       line-height: 1.2;
@@ -250,6 +269,100 @@
       color: #7a3452;
     }
 
+    .puzzle-form {
+      margin-top: 12px;
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+    }
+
+    .puzzle-input {
+      width: min(100%, 280px);
+      min-height: 44px;
+      border: 2px solid #de9bb9;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 1rem;
+      text-align: center;
+      color: #5c2740;
+      background: #fff;
+    }
+
+    .puzzle-input:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .quest-unlocked {
+      margin-top: 10px;
+      color: #7a2b4b;
+      font-weight: 700;
+    }
+
+    .quest-step {
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px solid #f2c3d6;
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .quest-step.step-enter {
+      animation: questStepIn 420ms ease both;
+    }
+
+    .quest-step.step-leave {
+      animation: questStepOut 260ms ease both;
+    }
+
+    @keyframes questStepIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes questStepOut {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+      }
+    }
+
+    .quest-step h3 {
+      margin: 0 0 8px;
+      color: #7a2b4b;
+      font-size: 1.05rem;
+    }
+
+    .quest-hint {
+      margin-top: 8px;
+      color: #7a4d5f;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .hint-toggle {
+      margin-top: 8px;
+      min-height: 42px;
+      min-width: 128px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 2px solid #de9bb9;
+      background: #fff;
+      color: #7a3452;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -283,6 +396,56 @@
     .modal-card p {
       margin: 10px 0 16px;
       color: #7a4d5f;
+    }
+
+    .start-quest {
+      margin-top: 12px;
+      background: linear-gradient(160deg, #ff7aa9, #e73774);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(199, 38, 93, 0.28);
+      animation: breathe 2.2s ease-in-out infinite;
+    }
+
+    .final-quest-text {
+      margin-top: 10px;
+      color: #7a2b4b;
+      font-weight: 700;
+    }
+
+    .romantic-celebration {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 40;
+    }
+
+    .romantic-piece {
+      position: absolute;
+      bottom: -20px;
+      font-size: clamp(18px, 3vw, 30px);
+      animation: romanticRise linear forwards;
+      opacity: 0;
+      filter: drop-shadow(0 6px 10px rgba(130, 27, 66, 0.25));
+    }
+
+    @keyframes romanticRise {
+      0% {
+        transform: translateY(0) scale(0.8) rotate(0deg);
+        opacity: 0;
+      }
+      12% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-115vh) scale(1.2) rotate(20deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
     }
 
     .burst-layer {
@@ -370,7 +533,6 @@
       <span class="sfx" id="sfx" aria-hidden="true">*dramatic sound effect*</span>
       <figure class="meme-reveal hidden" id="memeReveal">
         <img id="memeImg" alt="Funny meme card revealed after pressing No five times">
-        <figcaption>5 NO presses unlocked this meme 📸</figcaption>
       </figure>
 
       <div class="state hidden" id="yesState" tabindex="-1">
@@ -378,8 +540,78 @@
         <p>W rizz. Valentine secured.</p>
         <figure class="meme-reveal hidden" id="yesDirectReveal">
           <img id="yesDirectImg" alt="Valentine GIF shown when Yes is pressed directly">
-          <figcaption id="yesDirectCaption">Direct YES bonus unlocked 💌</figcaption>
+          <figcaption id="yesDirectCaption">YES unlocked 💌</figcaption>
         </figure>
+        <button class="btn start-quest" id="startQuestBtn" type="button">Start Quest ✨</button>
+      </div>
+
+      <div class="state hidden" id="boxPuzzleState" tabindex="-1">
+        <h2>Valentine Quest Mode 💘</h2>
+        <div class="quest-step" id="quest1Step">
+          <h3>Quest 1: Warming Up</h3>
+          <p>Four letters long, small but strong,<br>it warms your heart all day long. What is it?</p>
+          <button class="hint-toggle" id="quest1HintBtn" type="button">Show hint</button>
+          <p class="quest-hint hidden" id="quest1Hint">Hint: Starts with L</p>
+          <form class="puzzle-form" id="quest1Form">
+            <input
+              class="puzzle-input"
+              id="quest1Input"
+              type="text"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Type your answer"
+              aria-label="Quest 1 answer"
+            >
+            <button class="btn reconsider" id="quest1Submit" type="submit">Submit Quest 1</button>
+          </form>
+          <p class="reaction" id="quest1Feedback">Solve Quest 1 to continue.</p>
+          <p class="quest-unlocked hidden" id="boxUnlockedText">You're ready for the next quest.</p>
+          <button class="btn reconsider hidden" id="quest1NextBtn" type="button">Next Quest</button>
+        </div>
+
+        <div class="quest-step hidden" id="quest2Step">
+          <h3>Quest 2: Heart Signal</h3>
+          <p>Invisible to eyes, yet easy to feel.<br>It grows when given and fades when concealed. What is it?</p>
+          <button class="hint-toggle" id="quest2HintBtn" type="button">Show hint</button>
+          <p class="quest-hint hidden" id="quest2Hint">Hint: Same as before</p>
+          <form class="puzzle-form" id="quest2Form">
+            <input
+              class="puzzle-input"
+              id="quest2Input"
+              type="text"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Type your answer"
+              aria-label="Quest 2 answer"
+            >
+            <button class="btn reconsider" id="quest2Submit" type="submit">Submit Quest 2</button>
+          </form>
+          <p class="reaction" id="quest2Feedback">Pass Quest 2 to unlock the final challenge.</p>
+          <p class="quest-unlocked hidden" id="quest2UnlockedText">You got the mystery box 💎📦</p>
+          <button class="btn reconsider hidden" id="quest2NextBtn" type="button">Next Quest</button>
+        </div>
+
+        <div class="quest-step hidden" id="quest3Step">
+          <h3>Quest 3: Heart Phrase</h3>
+          <p>Say the most meaningful words from your heart out loud.</p>
+          <p>If spoken sincerely, the code will follow.</p>
+          <form class="puzzle-form" id="quest3Form">
+            <input
+              class="puzzle-input"
+              id="quest3CodeInput"
+              type="text"
+              autocomplete="off"
+              spellcheck="false"
+              inputmode="numeric"
+              placeholder="Enter the code"
+              aria-label="Quest 3 code"
+            >
+            <button class="btn reconsider" id="quest3CodeSubmit" type="submit">Submit Code</button>
+          </form>
+          <p class="reaction" id="quest3Feedback">Enter the code to finish the quest.</p>
+          <p class="quest-unlocked hidden" id="quest3KeyText">Now you can get the key 🔑</p>
+          <p class="final-quest-text hidden" id="finalQuestText">The final quest is to know how to open the box.</p>
+        </div>
       </div>
 
       <div class="state hidden" id="noState" tabindex="-1">
@@ -390,6 +622,12 @@
           Reconsider 😳
         </button>
       </div>
+
+      <footer class="card-footer">
+        <button class="music-toggle" id="musicToggleBtn" type="button" aria-label="Toggle background music">
+          Music: Off
+        </button>
+      </footer>
     </section>
   </main>
 
@@ -400,6 +638,17 @@
       <button class="btn reconsider" id="tryAgainBtn" type="button" aria-label="Close confirmation and try again">
         Try Again
       </button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="musicPrefModal" role="dialog" aria-modal="true" aria-labelledby="musicPrefTitle">
+    <div class="modal-card">
+      <h3 id="musicPrefTitle">Background Music?</h3>
+      <p>Do you want music on for this adventure?</p>
+      <div class="puzzle-form">
+        <button class="btn start-quest" id="musicOnBtn" type="button">Music On 🎵</button>
+        <button class="btn reconsider" id="musicOffBtn" type="button">Music Off 🔇</button>
+      </div>
     </div>
   </div>
 
@@ -424,6 +673,7 @@
       const yesBtn = document.getElementById("yesBtn");
       const noBtn = document.getElementById("noBtn");
       const reactionText = document.getElementById("reactionText");
+      const musicToggleBtn = document.getElementById("musicToggleBtn");
       const sfx = document.getElementById("sfx");
       const yesState = document.getElementById("yesState");
       const noState = document.getElementById("noState");
@@ -436,8 +686,38 @@
       const yesDirectReveal = document.getElementById("yesDirectReveal");
       const yesDirectImg = document.getElementById("yesDirectImg");
       const yesDirectCaption = document.getElementById("yesDirectCaption");
+      const startQuestBtn = document.getElementById("startQuestBtn");
+      const boxPuzzleState = document.getElementById("boxPuzzleState");
+      const quest1Step = document.getElementById("quest1Step");
+      const quest1Form = document.getElementById("quest1Form");
+      const quest1Input = document.getElementById("quest1Input");
+      const quest1Submit = document.getElementById("quest1Submit");
+      const quest1Feedback = document.getElementById("quest1Feedback");
+      const quest1HintBtn = document.getElementById("quest1HintBtn");
+      const quest1Hint = document.getElementById("quest1Hint");
+      const quest1NextBtn = document.getElementById("quest1NextBtn");
+      const quest2Step = document.getElementById("quest2Step");
+      const quest2Form = document.getElementById("quest2Form");
+      const quest2Input = document.getElementById("quest2Input");
+      const quest2Submit = document.getElementById("quest2Submit");
+      const quest2Feedback = document.getElementById("quest2Feedback");
+      const quest2HintBtn = document.getElementById("quest2HintBtn");
+      const quest2Hint = document.getElementById("quest2Hint");
+      const quest2UnlockedText = document.getElementById("quest2UnlockedText");
+      const quest2NextBtn = document.getElementById("quest2NextBtn");
+      const quest3Step = document.getElementById("quest3Step");
+      const quest3Form = document.getElementById("quest3Form");
+      const quest3CodeInput = document.getElementById("quest3CodeInput");
+      const quest3CodeSubmit = document.getElementById("quest3CodeSubmit");
+      const quest3Feedback = document.getElementById("quest3Feedback");
+      const quest3KeyText = document.getElementById("quest3KeyText");
+      const finalQuestText = document.getElementById("finalQuestText");
+      const boxUnlockedText = document.getElementById("boxUnlockedText");
       const yesConfirmModal = document.getElementById("yesConfirmModal");
       const tryAgainBtn = document.getElementById("tryAgainBtn");
+      const musicPrefModal = document.getElementById("musicPrefModal");
+      const musicOnBtn = document.getElementById("musicOnBtn");
+      const musicOffBtn = document.getElementById("musicOffBtn");
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       let dodgeCount = 0;
@@ -446,6 +726,16 @@
       let noIsDodging = true;
       let noBaseScale = 1;
       let hasShownFirstYesPrompt = false;
+      let boxUnlocked = false;
+      let quest2Unlocked = false;
+      let quest3Unlocked = false;
+      let quest3Completed = false;
+      let activeQuestStep = null;
+      let expectedQuest3Code = "0000";
+      let audioCtx = null;
+      let musicIsOn = false;
+      let musicWanted = false;
+      let musicTimer = null;
 
       function clamp(value, min, max) {
         return Math.max(min, Math.min(max, value));
@@ -461,17 +751,147 @@
         reactionText.textContent = text;
       }
 
+      function getAudioCtx() {
+        if (!audioCtx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return null;
+          audioCtx = new AudioCtx();
+        }
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+        return audioCtx;
+      }
+
+      function playTone(freq, duration, wave, gain, delay) {
+        const ctx = getAudioCtx();
+        if (!ctx) return;
+        const start = ctx.currentTime + (delay || 0);
+        const osc = ctx.createOscillator();
+        const amp = ctx.createGain();
+        osc.type = wave || "sine";
+        osc.frequency.value = freq;
+        amp.gain.setValueAtTime(0, start);
+        amp.gain.linearRampToValueAtTime(gain || 0.05, start + 0.01);
+        amp.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        osc.connect(amp);
+        amp.connect(ctx.destination);
+        osc.start(start);
+        osc.stop(start + duration + 0.02);
+      }
+
+      function playButtonSound(button) {
+        const id = button.id || "";
+        if (id === "yesBtn" || id === "startQuestBtn") {
+          playTone(523.25, 0.13, "triangle", 0.055, 0);
+          playTone(659.25, 0.16, "triangle", 0.05, 0.08);
+          return;
+        }
+        if (id === "noBtn") {
+          playTone(220, 0.12, "square", 0.035, 0);
+          playTone(196, 0.1, "square", 0.03, 0.08);
+          return;
+        }
+        if (id.includes("Submit") || id === "quest3CodeSubmit") {
+          playTone(392, 0.08, "sine", 0.04, 0);
+          return;
+        }
+        if (id.includes("Next")) {
+          playTone(440, 0.1, "triangle", 0.05, 0);
+          playTone(554.37, 0.12, "triangle", 0.04, 0.09);
+          return;
+        }
+        if (id.includes("Hint")) {
+          playTone(740, 0.06, "sine", 0.03, 0);
+          return;
+        }
+        if (id === "resetBtn" || id === "tryAgainBtn") {
+          playTone(330, 0.08, "sine", 0.03, 0);
+          playTone(262, 0.1, "sine", 0.025, 0.06);
+          return;
+        }
+        playTone(349.23, 0.08, "sine", 0.03, 0);
+      }
+
+      function playMusicNote(freq, duration, delay) {
+        const ctx = getAudioCtx();
+        if (!ctx || !musicIsOn) return;
+        const start = ctx.currentTime + (delay || 0);
+        const osc = ctx.createOscillator();
+        const amp = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        amp.gain.setValueAtTime(0.0001, start);
+        amp.gain.linearRampToValueAtTime(0.018, start + 0.08);
+        amp.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        osc.connect(amp);
+        amp.connect(ctx.destination);
+        osc.start(start);
+        osc.stop(start + duration + 0.02);
+      }
+
+      function playMusicBar() {
+        if (!musicIsOn) return;
+        const progression = [261.63, 329.63, 392.0, 329.63, 293.66, 349.23, 440.0, 349.23];
+        progression.forEach((freq, i) => playMusicNote(freq, 0.85, i * 0.35));
+        musicTimer = window.setTimeout(playMusicBar, 2800);
+      }
+
+      function startMusic() {
+        musicWanted = true;
+        if (musicIsOn) return;
+        musicIsOn = true;
+        musicToggleBtn.textContent = "Music: On";
+        playMusicBar();
+      }
+
+      function stopMusic() {
+        musicWanted = false;
+        musicIsOn = false;
+        musicToggleBtn.textContent = "Music: Off";
+        if (musicTimer) {
+          window.clearTimeout(musicTimer);
+          musicTimer = null;
+        }
+      }
+
+      function toggleMusic() {
+        if (musicIsOn) {
+          stopMusic();
+          return;
+        }
+        startMusic();
+      }
+
+      function setMusicPreference(turnOn) {
+        if (turnOn) {
+          startMusic();
+        } else {
+          stopMusic();
+        }
+        musicPrefModal.classList.add("hidden");
+      }
+
+      function kickMusicOnFirstGesture() {
+        if (!musicWanted) return;
+        startMusic();
+        playMusicNote(261.63, 0.5, 0);
+      }
+
       function buildMemeImage() {
         memeImg.src = MEME_IMAGE_URL;
         noStateMemeImg.src = MEME_IMAGE_URL;
         yesDirectImg.src = YES_DIRECT_GIF_URL;
       }
 
-      function applyQuestionFromUrl() {
+      function applyConfigFromUrl() {
         const params = new URLSearchParams(window.location.search);
         const q = (params.get("q") || "").trim();
-        if (!q) return;
-        title.textContent = q;
+        if (q) {
+          title.textContent = q;
+        }
+        const code = (params.get("code") || "").trim();
+        expectedQuest3Code = code || "0000";
       }
 
       function maybeRevealMeme() {
@@ -481,7 +901,6 @@
           noBtn.disabled = true;
           noIsDodging = false;
           zone.classList.add("center-yes");
-          showCaption("5 NO presses? Meme unlocked.");
           yesBtn.focus();
         }
       }
@@ -550,12 +969,13 @@
           noIsDodging = false;
           noBtn.textContent = "No 🙃";
           noBtn.style.transform = "scale(1)";
-          showCaption("Fine. You win. NO is now a normal button.");
+          showCaption("Fine 😑");
         }
       }
 
       function onNoPressAttempt(e) {
         if (e.type === "keydown" && e.repeat) return;
+        playButtonSound(noBtn);
         noPressCount += 1;
         maybeRevealMeme();
         dodgeNo(e);
@@ -581,6 +1001,7 @@
 
       function setEndState(type) {
         yesState.classList.add("hidden");
+        boxPuzzleState.classList.add("hidden");
         noState.classList.add("hidden");
 
         if (type === "yes") {
@@ -592,7 +1013,7 @@
           if (noPressCount === 0) {
             yesDirectReveal.classList.remove("hidden");
             yesDirectImg.src = YES_DIRECT_GIF_URL;
-            yesDirectCaption.textContent = "Direct YES bonus unlocked 💌";
+            yesDirectCaption.textContent = "YES unlocked 💌";
           } else {
             yesDirectReveal.classList.remove("hidden");
             yesDirectImg.src = YES_AFTER_FIVE_GIF_URL;
@@ -608,6 +1029,156 @@
         }
       }
 
+      function normalizeAnswer(text) {
+        return text.replace(/[^a-z]/gi, "").toUpperCase();
+      }
+
+      function setQuestStep(stepEl) {
+        const focusMap = {
+          quest1Step: quest1Input,
+          quest2Step: quest2Input,
+          quest3Step: quest3CodeInput
+        };
+
+        if (!activeQuestStep) {
+          stepEl.classList.remove("hidden", "step-leave");
+          stepEl.classList.add("step-enter");
+          window.setTimeout(() => {
+            stepEl.classList.remove("step-enter");
+            const focusEl = focusMap[stepEl.id];
+            if (focusEl && !focusEl.disabled) focusEl.focus();
+          }, 430);
+          activeQuestStep = stepEl;
+          return;
+        }
+
+        if (activeQuestStep === stepEl) return;
+
+        const previous = activeQuestStep;
+        previous.classList.remove("step-enter");
+        previous.classList.add("step-leave");
+
+        window.setTimeout(() => {
+          previous.classList.add("hidden");
+          previous.classList.remove("step-leave");
+          stepEl.classList.remove("hidden", "step-leave");
+          stepEl.classList.add("step-enter");
+          activeQuestStep = stepEl;
+          window.setTimeout(() => {
+            stepEl.classList.remove("step-enter");
+            const focusEl = focusMap[stepEl.id];
+            if (focusEl && !focusEl.disabled) focusEl.focus();
+          }, 430);
+        }, 250);
+      }
+
+      function toggleHint(hintEl, buttonEl) {
+        const isHidden = hintEl.classList.contains("hidden");
+        if (isHidden) {
+          hintEl.classList.remove("hidden");
+          buttonEl.textContent = "Hide hint";
+          return;
+        }
+        hintEl.classList.add("hidden");
+        buttonEl.textContent = "Show hint";
+      }
+
+      function handleQuest1Submit(e) {
+        e.preventDefault();
+        if (boxUnlocked) return;
+
+        const answer = normalizeAnswer(quest1Input.value.trim());
+        if (answer === "LOVE") {
+          boxUnlocked = true;
+          quest1Feedback.textContent = "Correct. You passed Quest 1.";
+          boxUnlockedText.classList.remove("hidden");
+          quest1Input.disabled = true;
+          quest1Submit.disabled = true;
+          quest1Submit.classList.add("hidden");
+          quest1NextBtn.classList.remove("hidden");
+          showCaption("Quest 1 complete.");
+          return;
+        }
+
+        quest1Feedback.textContent = "Nope. Try again 💡";
+      }
+
+      function goToQuest2() {
+        if (!boxUnlocked) return;
+        quest2Unlocked = true;
+        setQuestStep(quest2Step);
+        quest1NextBtn.classList.add("hidden");
+        quest1NextBtn.disabled = true;
+        showCaption("Quest 2 unlocked.");
+      }
+
+      function handleQuest2Submit(e) {
+        e.preventDefault();
+        if (!quest2Unlocked || quest3Unlocked) return;
+
+        const answer = normalizeAnswer(quest2Input.value.trim());
+        if (answer === "LOVE") {
+          quest3Unlocked = true;
+          quest2Feedback.textContent = "Correct. Final quest unlocked.";
+          quest2UnlockedText.classList.remove("hidden");
+          quest2Input.disabled = true;
+          quest2Submit.disabled = true;
+          quest2Submit.classList.add("hidden");
+          quest2NextBtn.classList.remove("hidden");
+          showCaption("Quest 2 complete.");
+          return;
+        }
+
+        quest2Feedback.textContent = "Not quite. Try again 💗";
+      }
+
+      function goToQuest3() {
+        if (!quest3Unlocked) return;
+        quest2NextBtn.classList.add("hidden");
+        quest2NextBtn.disabled = true;
+        setQuestStep(quest3Step);
+        showCaption("Final quest unlocked.");
+      }
+
+      function handleQuest3Submit(e) {
+        e.preventDefault();
+        if (!quest3Unlocked || quest3Completed) return;
+        if (quest3CodeInput.value.trim() === expectedQuest3Code) {
+          quest3Completed = true;
+          quest3Feedback.textContent = "Correct code.";
+          quest3KeyText.classList.remove("hidden");
+          finalQuestText.classList.remove("hidden");
+          quest3CodeInput.disabled = true;
+          quest3CodeSubmit.disabled = true;
+          quest3CodeSubmit.classList.add("hidden");
+          triggerRomanticCelebration();
+          showCaption("Quest 3 complete.");
+          return;
+        }
+        quest3Feedback.textContent = "Wrong code. Try again.";
+      }
+
+      function triggerRomanticCelebration() {
+        const layer = document.createElement("div");
+        layer.className = "romantic-celebration";
+        const symbols = ["💖", "💘", "💕", "✨", "💞", "🌹"];
+        const count = prefersReducedMotion ? 10 : 36;
+        for (let i = 0; i < count; i++) {
+          const piece = document.createElement("span");
+          piece.className = "romantic-piece";
+          piece.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+          piece.style.left = Math.random() * 100 + "%";
+          piece.style.animationDuration = (1.8 + Math.random() * 1.6).toFixed(2) + "s";
+          piece.style.animationDelay = (Math.random() * 0.45).toFixed(2) + "s";
+          layer.appendChild(piece);
+        }
+        document.body.appendChild(layer);
+        if (!prefersReducedMotion) {
+          makeBurst(["💖", "💘", "💕", "✨", "💞"], 42);
+        }
+        window.setTimeout(() => layer.remove(), 3800);
+      }
+
       function openFirstYesPrompt() {
         yesConfirmModal.classList.remove("hidden");
         tryAgainBtn.focus();
@@ -618,6 +1189,13 @@
         yesBtn.focus();
       }
 
+      function startQuestFlow() {
+        yesState.classList.add("hidden");
+        boxPuzzleState.classList.remove("hidden");
+        setQuestStep(quest1Step);
+        showCaption("Quest started. Good luck.");
+      }
+
       function resetUI() {
         dodgeCount = 0;
         noPressCount = 0;
@@ -625,6 +1203,11 @@
         noIsDodging = true;
         noBaseScale = 1;
         hasShownFirstYesPrompt = false;
+        boxUnlocked = false;
+        quest2Unlocked = false;
+        quest3Unlocked = false;
+        quest3Completed = false;
+        activeQuestStep = null;
 
         noBtn.textContent = "No 🙃";
         noBtn.disabled = false;
@@ -640,10 +1223,45 @@
         burstLayer.innerHTML = "";
         zone.classList.remove("hidden");
         yesState.classList.add("hidden");
+        boxPuzzleState.classList.add("hidden");
         noState.classList.add("hidden");
         memeReveal.classList.add("hidden");
         yesDirectReveal.classList.add("hidden");
         yesConfirmModal.classList.add("hidden");
+        boxUnlockedText.classList.add("hidden");
+        quest2UnlockedText.classList.add("hidden");
+        quest1Hint.classList.add("hidden");
+        quest1HintBtn.textContent = "Show hint";
+        quest2Hint.classList.add("hidden");
+        quest2HintBtn.textContent = "Show hint";
+        quest1Step.classList.remove("hidden");
+        quest2Step.classList.add("hidden");
+        quest3Step.classList.add("hidden");
+        quest1Step.classList.remove("step-enter", "step-leave");
+        quest2Step.classList.remove("step-enter", "step-leave");
+        quest3Step.classList.remove("step-enter", "step-leave");
+        quest1NextBtn.classList.add("hidden");
+        quest1NextBtn.disabled = false;
+        quest1Input.value = "";
+        quest1Input.disabled = false;
+        quest1Submit.disabled = false;
+        quest1Submit.classList.remove("hidden");
+        quest1Feedback.textContent = "Solve Quest 1 to continue.";
+        quest2Input.value = "";
+        quest2Input.disabled = false;
+        quest2Submit.disabled = false;
+        quest2Submit.classList.remove("hidden");
+        quest2Feedback.textContent = "Pass Quest 2 to unlock the final challenge.";
+        quest2NextBtn.classList.add("hidden");
+        quest2NextBtn.disabled = false;
+        quest3CodeInput.value = "";
+        quest3CodeInput.disabled = false;
+        quest3CodeSubmit.disabled = false;
+        quest3CodeSubmit.classList.remove("hidden");
+        quest3Feedback.textContent = "Enter the code to finish the quest.";
+        quest3KeyText.classList.add("hidden");
+        finalQuestText.classList.add("hidden");
+        document.querySelectorAll(".romantic-celebration").forEach((el) => el.remove());
         showCaption("Pick a button, brave soul.");
         sfx.classList.remove("show");
         yesBtn.focus();
@@ -664,6 +1282,14 @@
         }
       }
 
+      document.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => playButtonSound(button));
+      });
+      musicToggleBtn.addEventListener("click", toggleMusic);
+      document.addEventListener("pointerdown", kickMusicOnFirstGesture, { once: true });
+      musicOnBtn.addEventListener("click", () => setMusicPreference(true));
+      musicOffBtn.addEventListener("click", () => setMusicPreference(false));
+
       noBtn.addEventListener("pointerdown", onNoPressAttempt);
       noBtn.addEventListener("click", (e) => {
         if (noIsDodging) {
@@ -683,6 +1309,14 @@
       });
       resetBtn.addEventListener("click", resetUI);
       tryAgainBtn.addEventListener("click", closeFirstYesPrompt);
+      startQuestBtn.addEventListener("click", startQuestFlow);
+      quest1Form.addEventListener("submit", handleQuest1Submit);
+      quest1NextBtn.addEventListener("click", goToQuest2);
+      quest2Form.addEventListener("submit", handleQuest2Submit);
+      quest2NextBtn.addEventListener("click", goToQuest3);
+      quest3Form.addEventListener("submit", handleQuest3Submit);
+      quest1HintBtn.addEventListener("click", () => toggleHint(quest1Hint, quest1HintBtn));
+      quest2HintBtn.addEventListener("click", () => toggleHint(quest2Hint, quest2HintBtn));
 
       noBtn.addEventListener("keydown", (e) => {
         if ((e.key === "Enter" || e.key === " ") && noIsDodging) {
@@ -691,7 +1325,7 @@
       });
 
       buildMemeImage();
-      applyQuestionFromUrl();
+      applyConfigFromUrl();
       createFloatingHearts();
     })();
   </script>
